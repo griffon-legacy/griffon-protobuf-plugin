@@ -46,7 +46,7 @@ class ProtobufGriffonPlugin {
             email: 'aalmiray@yahoo.com'
         ]
     ]
-    String title = 'Enables interoperability between JVM languages'
+    String title = 'ProcolBuffers integration'
     // accepts Markdown syntax. See http://daringfireball.net/projects/markdown/ for details
     String description = '''
 Provides integration with [Google Protocol Buffers][1] – a language-neutral, platform-neutral, extensible way of
