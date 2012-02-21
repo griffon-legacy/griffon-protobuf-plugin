@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  * @author Andres Almiray
  */
 
-includeTargets << griffonScript("Init")
 includeTargets << griffonScript("_GriffonCompile")
 
-target(protoc: "Compile Protobuf sources with protoc") {
-    depends(checkVersion, classpath, parseArguments)
+target(name: 'protoc', description: "Compile Protobuf sources with protoc",
+    prehook: null, posthook: null) {
+    depends(classpath)
     gensrcDir = "${projectWorkDir}/gensrc"
     gensrcDirPath = new File(gensrcDir)
 
@@ -54,26 +54,26 @@ Make sure you have a similar setting on your griffon-app/conf/BuildConfig.groovy
        if(x == skipIt) uptodate = false
        else throw x
     }
-    if(uptodate) {
+    
+    if(!uptodate) {
+        ant.echo(message: "[protoc] Invoking $protocExecutable on $protobufsrc")
+        ant.echo(message: "[protoc] Generated sources will be placed in $gensrcDir")
+        ant.fileset(dir: protobufsrcDir, includes: "**/*.proto").each { protofile ->
+            ant.echo(message: "[protoc] Compiling $protofile")
+            Process protoc = "$protocExecutable -I=$protobufsrc --java_out=$gensrcDir $protofile".execute([] as String[], new File(basedir))
+            protoc.consumeProcessOutput(System.out, System.err)
+            protoc.waitFor()
+            File markerFile = new File(gensrcDirPath.absolutePath + "/." + (protofile.toString() - protobufsrc).substring(1))
+            ant.touch(file: markerFile)
+        }
+    } else {
        ant.echo(message: "[protoc] Protobuf sources are up to date")
-       return
     }
 
-    ant.echo(message: "[protoc] Invoking $protocExecutable on $protobufsrc")
-    ant.echo(message: "[protoc] Generated sources will be placed in $gensrcDir")
-    ant.fileset(dir: protobufsrcDir, includes: "**/*.proto").each { protofile ->
-        ant.echo(message: "[protoc] Compiling $protofile")
-        Process protoc = "$protocExecutable -I=$protobufsrc --java_out=$gensrcDir $protofile".execute([] as String[], new File(basedir))
-        protoc.consumeProcessOutput(System.out, System.err)
-        protoc.waitFor()
-        File markerFile = new File(gensrcDirPath.absolutePath + "/." + (protofile.toString() - protobufsrc).substring(1))
-        ant.touch(file: markerFile)
-    }
-
-    ant.mkdir(dir: classesDirPath)
-    ant.echo(message: "[protoc] Compiling generated sources to $classesDirPath")
+    ant.mkdir(dir: projectMainClassesDir)
+    ant.echo(message: "[protoc] Compiling generated sources to $projectMainClassesDir")
     String classpathId = "griffon.compile.classpath"
-    compileSources(classesDirPath, classpathId) {
+    compileSources(projectMainClassesDir, classpathId) {
         src(path: gensrcDirPath)
         javac(classpathref: classpathId)
     }
