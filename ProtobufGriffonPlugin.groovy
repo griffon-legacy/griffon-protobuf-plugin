@@ -64,6 +64,11 @@ Place your `.proto` sources at `$basedir/src/protobuf`. They will be automatical
 (and classes) whenever the application is compiled. Alternatively you may call the `protoc` command to compile protobuf
 sources at any time.
 
+Configuration
+-------------
+
+Protobuf version currently supported is **2.4.1**.
+
 Scripts
 -------
 
