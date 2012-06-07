@@ -73,7 +73,7 @@ Make sure you have a similar setting on your griffon-app/conf/BuildConfig.groovy
     ant.mkdir(dir: projectMainClassesDir)
     ant.echo(message: "[protoc] Compiling generated sources to $projectMainClassesDir")
     String classpathId = "griffon.compile.classpath"
-    compileSources(projectMainClassesDir, classpathId) {
+    compileProjectSources(griffonSettings.baseDir, projectMainClassesDir, classpathId) {
         src(path: gensrcDirPath)
         javac(classpathref: classpathId)
     }
